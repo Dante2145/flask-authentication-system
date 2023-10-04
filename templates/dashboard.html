@@ -10,15 +10,31 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Page 2</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Page 3</a>
+            </li>
+          </ul>
+        </nav>
 
-<div class="container">
-    <div class=" row justify-content-center">
-        <div class="col-sm-8">
-            <h2>user dashboard</h2>
-            <p><b>Name: </b> {{user.name }}</p>
-            <p><b>Email: </b> {{user.email }}</p>
-            <a href="/logout" class="btn btn-dark">Logout</a>
-        </div>
+    <div class="container">
+        <div class=" row justify-content-center">
+            <div class="col-sm-8">
+                <h2>user dashboard</h2>
+                <p><b>Name: </b> {{user.name }}</p>
+                <p><b>Email: </b> {{user.email }}</p>
+                <a href="/logout" class="btn btn-dark">Logout</a>
+            </div>
 
     </div>
   

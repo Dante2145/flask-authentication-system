@@ -1,6 +1,7 @@
 from flask import Flask, request,render_template, redirect,session
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
+import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -20,6 +21,29 @@ class User(db.Model):
     
     def check_password(self,password):
         return bcrypt.checkpw(password.encode('utf-8'),self.password.encode('utf-8'))
+
+class Domain(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    domain = db.Column(db.String(50), unique=True)
+    result = db.Column(db.String(100))
+    mx_records = db.Column(db.String(100))
+    a_records = db.Column(db.String(100))
+    txt_records = db.Column(db.String(100))
+    ns_records = db.Column(db.String(100))
+    sslyze_result = db.Column(db.String(100))
+    
+
+    def __init__(self,domain, result, mx_records, a_records,txt_records, ns_records,sslyze_result, scan_date):
+        self.domain = domain
+        self.result = result
+        self.mx_records = mx_records
+        self.a_records = a_records
+        self.txt_records = txt_records
+        self.ns_records = ns_records
+        self.sslyze_result = sslyze_result
+        self.scan_date = scan_date
+        
+
 
 with app.app_context():
     db.create_all()
