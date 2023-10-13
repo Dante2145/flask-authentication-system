@@ -2,11 +2,17 @@ from flask import Flask, request,render_template, redirect,session
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 import datetime
+from nmap3 import Nmap
+import sqlite3
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.secret_key = 'secret_key'
+nmap = Nmap()
+
+                       
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,8 +49,21 @@ class Domain(db.Model):
         self.sslyze_result = sslyze_result
         self.scan_date = scan_date
         
+class Scan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(20))
+    osmatch = db.Column(db.String(50))
+    hostname = db.Column(db.String(50))
+    macaddress = db.Column(db.String(50))
+    scanType = db.Column(db.String(10))
 
-
+    def __init__(self, ip_address, osmatch, hostname, macaddress, scanType):
+        self.ip_address = ip_address
+        self.scanType = scanType
+        self.osmatch = osmatch
+        self.hostname = hostname
+        self.macaddress = macaddress
+        
 with app.app_context():
     db.create_all()
 
@@ -99,6 +118,96 @@ def dashboard():
 def logout():
     session.pop('email',None)
     return redirect('/login')
+
+
+@app.route('/scan_results')
+def scanAll_results():
+    query = request.args.get('query')
+
+    conn = sqlite3.connect('./instance/database.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM scan WHERE ip_address LIKE ?", ('%' + query + '%',))
+    search_results = cursor.fetchall()
+    #cursor.execute("SELECT * FROM scan")
+    #data = cursor.fetchall()
+    #cursor.execute(f"PRAGMA table_info(scan)")
+    #column_info = cursor.fetchall()
+
+    #column_names = [col[1] for col in column_info]
+    #print("Column Names:")
+    #for name in column_names:
+    #    print(name)
+    #print(data)
+    cursor.close()
+    conn.close()
+
+    html_output = "<ul>"
+    for row in search_results:
+        html_output += f"<li>{row[0]} - {row[1]}</li>"
+    html_output +="</ul>"
+
+    return html_output
+
+    
+
+@app.route('/past_results')
+def scan_results():
+    
+    conn = sqlite3.connect('./instance/database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM scan")
+    data = cursor.fetchall()
+    cursor.execute(f"PRAGMA table_info(scan)")
+    column_info = cursor.fetchall()
+
+    column_names = [col[1] for col in column_info]
+    print("Column Names:")
+    for name in column_names:
+        print(name)
+    print(data)
+    cursor.close()
+    conn.close()
+
+    return render_template('results_template.html', data=data) # data is a list
+
+
+@app.route('/scan', methods=['POST'])
+def scan():
+    ip_address = request.form.get('ip_address')
+    scanOptions= request.form.get('scanOptions')
+    if ip_address:
+        try:
+            # Run the Nmap scan
+            #if scanOptions == "Stealth":
+            #scanArg = "-sT"
+            #elif 
+            nmap_output = nmap.scan_top_ports(ip_address)
+            scan_results = nmap_output[ip_address]
+            ports = nmap_output[ip_address]['ports']
+            #For Database Writing
+            if not nmap_output[ip_address]['osmatch']:
+                osmatch = "NA"
+            else: osmatch = nmap_output[ip_address]['osmatch']
+
+            if not nmap_output[ip_address]['hostname']:
+                hostname = "NA"
+            else: hostname = nmap_output[ip_address]['hostname']
+            
+            if not nmap_output[ip_address]['macaddress']:
+                macaddress = "NA"
+            else: macaddress = nmap_output[ip_address]['macaddress']
+
+            newscanResult = Scan(ip_address=ip_address,osmatch=osmatch, hostname=hostname,macaddress=macaddress, scanType=scanOptions)
+            db.session.add(newscanResult)
+            db.session.commit()
+        
+            
+            return render_template('scan_results.html', ip_address=ip_address, ports=ports, scan_results=scan_results, scanOptions=scanOptions)
+        except Exception as e:
+            return f"Error: {str(e)}"
+    else:
+        return "Please provide an IP address to scan."
 
 if __name__ == '__main__':
     app.run(debug=True)

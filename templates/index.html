@@ -18,7 +18,7 @@
               <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Page 2</a>
+              <a class="nav-link" href="/past_results">Scan Results</a>
             </li>
             <li class="nav-item">
               <a class="nav-link disabled" href="#">Page 3</a>
@@ -37,19 +37,20 @@
             <div class="col-sm-8">
                 <h2>Home page</h2>
                 <h3>Domain Scanner</h3>
-                <form id="scanForm">
-                    <input type="text" id="domain" name="domain" placeholder="Enter domain">
+                <form method="POST" action="/scan" id="scan-Form">
+                    <input type="text" id="ip_address" name="ip_address" placeholder="Enter domain or IP Address">
+                    <select id="scanOptions" name="scanOptions">
+                      <!--To change the Values of these options and have an statement in app.py-->
+                      <option>sT</option>
+                      <option>sS</option>
+                    </select>
                     <button type="submit">Scan</button> 
                 </form>
-                <div id="response"></div>
 
-                <a href="/register" class="btn btn-primary mt-3">Register</a>
-                <a href="/login" class="btn btn-dark mt-3">Login</a>
-            </div>
 
         </div>
     
     </div>
-
+    
 </body>
 </html>

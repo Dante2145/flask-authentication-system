@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Flask App</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/scan_results">Scan Results</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Page 3</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+          </ul>
+        </nav>
+
+        
+
+        <div id="response">
+            <h2>Scan Results for {{ ip_address }} with {{ scanOptions }} Selected</h2>
+            
+            <div>
+                <h3>OS Match</h3>
+                {% if not scan_results.osmatch %}
+                    <p>NO OS match found</p>
+                {% else %}
+                    {{ scan_results.osmatch }}
+                {% endif %}
+                <h3>Ports</h3>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Protocol</th>
+                            <th>Port</th>
+                            <th>State</th>
+                            <th>Reason</th>
+                            <th>Reason TTL</th>
+                            <th>Service Name</th>
+                            <th>Method</th>
+                            <th>Conf</th>
+                            <th>CPE</th>
+                            <th>Scripts</th>
+                          </tr>
+                    </thead>
+                    <tbody>
+                        {% for items in ports %} 
+                        <tr>
+                          <td>{{ items.protocol }}</td>
+                          <td>{{ items.portid }}</td>
+                          <td>{{ items.state }}</td>
+                          <td>{{ items.reason }}</td>
+                          <td>{{ items.reason_ttl }}</td>
+                          <td>{{ items.service.name }}</td>
+                          <td>{{ items.service.method }}</td>
+                          <td>{{ items.service.conf }}</td>
+                          <td>
+                            {% if not items.cpe %}
+                                <p>NA</p>
+                            {% else %}
+                                {{ items.cpe }}
+                            {% endif %}
+                            </td>
+                            <td>
+                                {% if not items.scripts %}
+                                    <p>NA</p>
+                                {% else %}
+                                    {{ items.scripts }}
+                                {% endif %}
+                                </td>
+                        </tr>
+                        {% endfor %}
+                </table>
+                    
+                <h3>Host Name</h3>
+                {% if not scan_results.hostname %}
+                    <p>No Host Name found</p>
+                {% else %}
+                    {{ scan_results.hostname }}
+                {% endif %}
+                <h3>MAC address</h3>
+                {% if not scan_results.macaddress %}
+                    <p>No MAC Address found</p>
+                {% else %}
+                    {{ scan_results.macaddress }}
+                {% endif %}
+                <h3>State</h3>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Reason</th>
+                            <th>Reason TTL</th>
+                          </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                          <td>{{scan_results.state.state}}</td>
+                          <td>{{scan_results.state.reason}}</td>
+                          <td>{{scan_results.state.reason_ttl}}</td>        
+                        </tr>
+                        
+                </table>
+                
+            </div>
+        </div>
+            
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Results</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/scan_results">Scan Results</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Page 3</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+          </ul>
+        </nav>
+
+        <form id="search-form">
+            <input type="text" id="search-input" placeholder="Search...">
+            <button type="submit">Search</button>
+        </form>
+
+
+        <div id="search-results"></div>
+  
+        {% for items in data %}
+                
+        <div>
+            <h2>Scan Results for {{ items[1] }} with {{ items[5] }} Selected</h2>
+            <p>
+                {{data[0][1]}}
+            </p>
+            
+            <div>
+                <h3>OS Match</h3>
+                {% if not items[2] %}
+                    <p>NO OS match found</p>
+                {% else %}
+                    {{ items[2] }}
+                {% endif %}
+                                    
+                <h3>Host Name</h3>
+                {% if not items[3] %}
+                    <p>No Host Name found</p>
+                {% else %}
+                    {{ items[3] }}
+                {% endif %}
+                
+                <h3>MAC address</h3>
+                {% if not items[4] %}
+                    <p>No MAC Address found</p>
+                {% else %}
+                    {{ items[4] }}
+                {% endif %}
+
+                </table>
+        {% endfor %}
+            </div>
+        </div>
+
+<script>
+    document.getElementById('search-form').addEventListener('submit',function(event) {
+        event.preventDefault();
+
+        const query = document.getElementById('search-input').value;
+
+        fetch(`/search?query=${query}`)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('search-results').innerHTML = data;
+        });
+    });
+</script>
+</body>
+</html>
